@@ -3,7 +3,17 @@ import styles from './styles.module.scss';
 
 export default function Player() {
     return (
-        <div>
+        <div className={styles.container}>
+            <header>
+                <img src="/playing.svg" alt="Tocando agora"/>
+                <strong>Tocando agora</strong>
+            </header>
+
+            <div className={styles.emptyPlayer}>
+                <strong>Selecione um podcast para ouvir</strong>
+            </div>
+
+            <footer></footer>
         </div>
     );
 }
