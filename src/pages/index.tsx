@@ -42,6 +42,7 @@ export default function Home({latestEpisodes, allEpisodes}: HomeProps) {
       </Head>
 
       <section className={styles.latestEpisodes}>
+
         <h2>Últimos lançamentos</h2>
         
         <ul>
