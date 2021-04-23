@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import Slider from 'rc-slider';
 
 import { usePlayer } from '../../contexts/PlayerContext';
@@ -7,15 +7,42 @@ import { usePlayer } from '../../contexts/PlayerContext';
 
 import styles from './styles.module.scss';
 import 'rc-slider/assets/index.css';
+import { convertDurationToTimeString } from '../../utils/convertDurationToTimeString';
 
 
 export function Player() {
     const audioRef = useRef<HTMLAudioElement>(null);
+    const [progress, setProgress] = useState(0);
 
+    function setupProgressListener() {
+        audioRef.current.currentTime = 0;
+
+        audioRef.current.addEventListener('timeupdate', () => {
+            setProgress(Math.floor(audioRef.current.currentTime));
+        })
+    }
+
+    function handleSeek(amount: number) {
+        audioRef.current.currentTime = amount;
+        setProgress(amount);
+    }
+
+    function handleEpisodeEnded() {
+        if (hasNext) {
+            playNext();
+        } else if (hasPrevious) {
+            playPrevious();
+        } else {
+            clearPlayerState();
+        }
+    }
+
+ 
     const {
         episodeList, 
         currentEpisodeIndex, 
         isPlaying, 
+        clearPlayerState,
         toggleLoop,
         togglePlay,
         toggleShuffle,
@@ -68,10 +95,15 @@ export function Player() {
 
             <footer className={!episode ? styles.empty : ''}>
                 <div className={styles.progress}>
-                    <span>00:00</span>
+                    <span>
+                        {convertDurationToTimeString(progress)}
+                    </span>
                     <div className={styles.slider}>
                        {episode ? (
                          <Slider
+                            max={episode.duration}
+                            value={progress}
+                            onChange={handleSeek}
                             trackStyle={{backgroundColor: '#04d361'}}
                             railStyle={{backgroundColor: '#9f75ff'}}
                             handleStyle={{borderColor: '#04d361', borderWidth: 4}}
@@ -80,7 +112,9 @@ export function Player() {
                          <div className={styles.emptySlider}/> 
                        )}
                     </div>
-                    <span> 00:00</span>
+                    {/* se não tive ep ele coloca 0 e o interrogação 
+                    evita que ele tente carregar sem dados */}
+                    <span> {convertDurationToTimeString(episode?.duration ?? 0)}</span>
                 </div>
 
                 {episode && (
@@ -89,8 +123,10 @@ export function Player() {
                         src={episode.url}
                         ref={audioRef}
                         loop={isLooping}
+                        onEnded={handleEpisodeEnded}
                         onPlay={() => setPlayingState(true)}
                         onPause={() => setPlayingState(false)}
+                        onLoadedMetadata={setupProgressListener}
                     />
                 )}
 
@@ -98,7 +134,7 @@ export function Player() {
                     <button 
                         type="button" 
                         disabled={!episode || episodeList.length === 1}
-                        onClick={() => toggleShuffle}
+                        onClick={toggleShuffle}
                         className={isShuffling ? styles.isActive : ''}
                         >
                         <img src="/shuffle.svg" alt="Embaralhar"/>
