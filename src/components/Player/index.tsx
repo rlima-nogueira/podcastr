@@ -9,7 +9,7 @@ import styles from './styles.module.scss';
 import 'rc-slider/assets/index.css';
 
 
-export default function Player() {
+export function Player() {
     const audioRef = useRef<HTMLAudioElement>(null);
 
     const {
@@ -17,7 +17,11 @@ export default function Player() {
         currentEpisodeIndex, 
         isPlaying, 
         togglePlay,
-        setPlayingState
+        setPlayingState,
+        playNext,
+        playPrevious,
+        hasNext,
+        hasPrevious,
     } = useContext(PlayerContext);
 
     useEffect(() => {
@@ -89,7 +93,11 @@ export default function Player() {
                     <button type="button" disabled={!episode}>
                         <img src="/shuffle.svg" alt="Embaralhar"/>
                     </button>
-                    <button type="button" disabled={!episode}>
+                    <button 
+                        type="button" 
+                        disabled={!episode || !hasPrevious}
+                        onClick={playPrevious}
+                        >
                         <img src="/play-previous.svg" alt="Tocar anterior"/>
                     </button>
                     <button 
@@ -103,7 +111,11 @@ export default function Player() {
                             <img src="/play.svg" alt="Tocar"/>
                         }                       
                     </button>
-                    <button type="button" disabled={!episode}> 
+                    <button 
+                        type="button" 
+                        disabled={!episode || !hasNext}
+                        onClick={playNext}
+                        > 
                         <img src="/play-next.svg" alt="Tocar próxima"/>
                     </button>
                     <button type="button" disabled={!episode}>
