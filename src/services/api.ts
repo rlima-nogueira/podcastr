@@ -1,6 +1,6 @@
 import axios from 'axios';
 
 export const api = axios.create({
-    baseURL: 'https://my-json-server.typicode.com/rlima-nogueira/mock-podcastr/episodes'
+    baseURL: 'https://my-json-server.typicode.com/rlima-nogueira/mock-podcastr'
 })
 
